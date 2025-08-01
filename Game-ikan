@@ -1,0 +1,150 @@
+📁 /ikan-game/
+
+
+---
+
+📄 index.html
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tangkap Ikan!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <button id="fullscreen-btn">Layar Penuh</button>
+  <div id="score">Skor: 0</div>
+  <div id="timer">Waktu: 60</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+---
+
+📄 style.css
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+body {
+  background: url('assets/undersea-bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+#score, #timer {
+  position: absolute;
+  top: 1vh;
+  padding: 1vh 2vw;
+  border-radius: 10px;
+  font-size: 4vw;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+}
+#score { left: 2vw; }
+#timer { right: 2vw; }
+.fish {
+  position: absolute;
+  width: 12vw;
+  max-width: 80px;
+  transition: transform 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.fish:active {
+  transform: scale(0.8);
+}
+#fullscreen-btn {
+  position: absolute;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4vw;
+  padding: 1vh 2vw;
+  border-radius: 12px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  z-index: 20;
+}
+
+
+---
+
+📄 script.js
+
+const ikanList = [
+  'assets/clownfish.png',
+  'assets/yellowfish.png',
+  'assets/shark.png'
+];
+
+const clickSound = new Audio('assets/audio/click.mp3');
+clickSound.volume = 0.5;
+
+let skor = 0;
+let waktu = 60;
+
+const scoreEl = document.getElementById('score');
+const timerEl = document.getElementById('timer');
+const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+fullscreenBtn.onclick = () => {
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  }
+  fullscreenBtn.style.display = 'none';
+};
+
+function munculIkan() {
+  const ikan = document.createElement('img');
+  ikan.src = ikanList[Math.floor(Math.random() * ikanList.length)];
+  ikan.classList.add('fish');
+
+  const x = Math.random() * (window.innerWidth - 80);
+  const y = Math.random() * (window.innerHeight - 80);
+  ikan.style.left = `${x}px`;
+  ikan.style.top = `${y}px`;
+
+  ikan.onclick = () => {
+    skor++;
+    scoreEl.textContent = `Skor: ${skor}`;
+    clickSound.currentTime = 0;
+    clickSound.play();
+    ikan.remove();
+  };
+
+  document.body.appendChild(ikan);
+
+  setTimeout(() => {
+    if (document.body.contains(ikan)) ikan.remove();
+  }, 2000);
+}
+
+function mulaiGame() {
+  const interval = setInterval(() => munculIkan(), 800);
+  const timer = setInterval(() => {
+    waktu--;
+    timerEl.textContent = `Waktu: ${waktu}`;
+    if (waktu <= 0) {
+      clearInterval(timer);
+      clearInterval(interval);
+      alert(`Permainan selesai! Skor akhir kamu: ${skor}`);
+    }
+  }, 1000);
+}
+
+mulaiGame();
+
+
+---
+
+Game kini responsif, tampil fullscreen di HP, dan nyaman dikontrol anak-anak.
+
